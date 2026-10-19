@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+@layer utilities {
+  /* Frosted Glass Elements */
+  .frosted-glass {
+    background: rgba(10, 25, 47, 0.45);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 8px 32px 0 rgba(2, 12, 27, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .frosted-glass-card {
+    background: rgba(8, 28, 48, 0.40);
+    backdrop-filter: blur(24px) saturate(150%);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+  }
+
+  .frosted-glass-active {
+    background: rgba(6, 78, 102, 0.52);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid rgba(34, 211, 238, 0.45);
+    box-shadow: 0 0 25px -5px rgba(6, 182, 212, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+  }
+
+  .frosted-ocean-panel {
+    background: rgba(7, 26, 45, 0.42);
+    backdrop-filter: blur(28px) saturate(160%);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    border: 1px solid rgba(56, 189, 248, 0.18);
+    box-shadow: 0 20px 40px -15px rgba(2, 15, 30, 0.6), inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  .frosted-ocean-input {
+    background: rgba(3, 17, 34, 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+  }
+}
+
+/* Ambient Floating Underwater Bubbles */
+@keyframes float-bubble {
+  0% {
+    transform: translateY(105vh) scale(0.5);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.65;
+  }
+  80% {
+    opacity: 0.65;
+  }
+  100% {
+    transform: translateY(-15vh) scale(1.15) translateX(12px);
+    opacity: 0;
+  }
+}
+
+.ambient-bubble {
+  position: fixed;
+  bottom: -40px;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.75), rgba(56, 189, 248, 0.25) 50%, rgba(14, 116, 144, 0.08) 80%, rgba(255, 255, 255, 0.1));
+  border-radius: 50%;
+  pointer-events: none;
+  animation: float-bubble linear infinite;
+  box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.6), 0 0 8px rgba(34, 211, 238, 0.25);
+  z-index: 2;
+}
+
+/* Underwater Caustics Subtle Shimmer */
+@keyframes caustic-shimmer {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1) translateY(0);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1.03) translateY(-4px);
+  }
+}
+
+.caustic-glow {
+  animation: caustic-shimmer 8s ease-in-out infinite;
+}

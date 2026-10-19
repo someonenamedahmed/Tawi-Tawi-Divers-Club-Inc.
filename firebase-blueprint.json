@@ -1,0 +1,199 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with professional background, role, and job description.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique Firebase Authentication UID of the user.",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address verified via Google Sign-In.",
+          "maxLength": 254
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name of the user.",
+          "maxLength": 100
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "User avatar URL.",
+          "maxLength": 500
+        },
+        "role": {
+          "type": "string",
+          "description": "User professional role or title in the organization.",
+          "maxLength": 100
+        },
+        "department": {
+          "type": "string",
+          "description": "User department.",
+          "maxLength": 100
+        },
+        "jobDescription": {
+          "type": "string",
+          "description": "Detailed function and job description.",
+          "maxLength": 2000
+        },
+        "isSuperAdmin": {
+          "type": "boolean",
+          "description": "Flag indicating if user has Super Administrator privileges."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of user creation."
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last update."
+        }
+      },
+      "required": ["id", "email", "role", "department", "jobDescription"]
+    },
+    "Interaction": {
+      "title": "Interaction",
+      "description": "User quality audit reflection or multi-turn conversational interaction with Gemini.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique interaction document ID.",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Author UID owning the interaction.",
+          "maxLength": 128
+        },
+        "userEmail": {
+          "type": "string",
+          "description": "Email of author.",
+          "maxLength": 254
+        },
+        "userRole": {
+          "type": "string",
+          "description": "Author role at time of entry.",
+          "maxLength": 100
+        },
+        "department": {
+          "type": "string",
+          "description": "Author department at time of entry.",
+          "maxLength": 100
+        },
+        "category": {
+          "type": "string",
+          "description": "Entry category: process, difficulty, complaint, suggestion, or general.",
+          "enum": ["process", "difficulty", "complaint", "suggestion", "general"]
+        },
+        "prompt": {
+          "type": "string",
+          "description": "User input text describing workflow, bottlenecks, or feedback.",
+          "maxLength": 10000
+        },
+        "response": {
+          "type": "string",
+          "description": "Gemini AI response providing reflections, insights, or brainstorming.",
+          "maxLength": 20000
+        },
+        "reflectionSummary": {
+          "type": "string",
+          "description": "Synthesized executive takeaway from the interaction.",
+          "maxLength": 2000
+        },
+        "modelUsed": {
+          "type": "string",
+          "description": "Gemini model version executing generation.",
+          "maxLength": 100
+        },
+        "sentiment": {
+          "type": "string",
+          "description": "Detected tone or sentiment classification.",
+          "enum": ["positive", "neutral", "needs_attention", "critical"]
+        },
+        "tags": {
+          "type": "array",
+          "description": "Categorical tags associated with this interaction."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update timestamp."
+        }
+      },
+      "required": ["id", "userId", "category", "prompt", "response"]
+    },
+    "CompanyBenchmark": {
+      "title": "CompanyBenchmark",
+      "description": "Company standards, quality criteria, and SOP documentation uploaded by Super Admin.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique benchmark ID.",
+          "maxLength": 128
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the standard or audit benchmark.",
+          "maxLength": 200
+        },
+        "category": {
+          "type": "string",
+          "description": "Benchmark category.",
+          "enum": ["quality_standard", "sop", "policy", "kpi", "audit_rubric"]
+        },
+        "content": {
+          "type": "string",
+          "description": "Detailed standard criteria or reference guidelines.",
+          "maxLength": 50000
+        },
+        "uploadedBy": {
+          "type": "string",
+          "description": "Email of admin who uploaded the standard.",
+          "maxLength": 254
+        },
+        "uploadedByUid": {
+          "type": "string",
+          "description": "UID of admin who uploaded.",
+          "maxLength": 128
+        },
+        "version": {
+          "type": "string",
+          "description": "Version string e.g. v1.0.",
+          "maxLength": 30
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update timestamp."
+        }
+      },
+      "required": ["id", "title", "category", "content", "uploadedBy", "uploadedByUid"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Stores individual user profile and professional background information."
+    },
+    "/users/{userId}/interactions/{interactionId}": {
+      "schema": "Interaction",
+      "description": "Stores user quality audit journals, reflection sessions, and Gemini exchanges isolated to that user."
+    },
+    "/company_benchmarks/{benchmarkId}": {
+      "schema": "CompanyBenchmark",
+      "description": "Stores baseline company standards and quality audit benchmarks managed by Super Admin."
+    }
+  }
+}

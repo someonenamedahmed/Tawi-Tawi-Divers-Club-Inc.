@@ -1,0 +1,86 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. Global Default Deny Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isSuperAdmin() {
+      return isEmailVerified() && request.auth.token.email == 'aibrahim_220000002077@uic.edu.ph';
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidUser(data, userId) {
+      return data.keys().hasAll(['id', 'email', 'role', 'department', 'jobDescription']) &&
+        data.id is string && data.id == userId &&
+        data.email is string && data.email.size() <= 254 &&
+        data.role is string && data.role.size() <= 100 &&
+        data.department is string && data.department.size() <= 100 &&
+        data.jobDescription is string && data.jobDescription.size() <= 2000 &&
+        // Prevent privilege self-escalation
+        (!('isSuperAdmin' in data) || data.isSuperAdmin == false || isSuperAdmin());
+    }
+
+    function isValidInteraction(data, userId) {
+      return data.keys().hasAll(['id', 'userId', 'category', 'prompt', 'response']) &&
+        data.id is string && data.id.size() <= 128 &&
+        data.userId is string && data.userId == userId &&
+        data.category in ['process', 'difficulty', 'complaint', 'suggestion', 'general'] &&
+        data.prompt is string && data.prompt.size() <= 10000 &&
+        data.response is string && data.response.size() <= 20000;
+    }
+
+    function isValidBenchmark(data) {
+      return data.keys().hasAll(['id', 'title', 'category', 'content', 'uploadedBy', 'uploadedByUid']) &&
+        data.id is string && data.id.size() <= 128 &&
+        data.title is string && data.title.size() <= 200 &&
+        data.category in ['quality_standard', 'sop', 'policy', 'kpi', 'audit_rubric'] &&
+        data.content is string && data.content.size() <= 50000 &&
+        data.uploadedBy is string && data.uploadedBy.size() <= 254 &&
+        data.uploadedByUid is string && data.uploadedByUid == request.auth.uid;
+    }
+
+    // 2. User Profiles
+    match /users/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isSuperAdmin());
+      allow list: if isSuperAdmin();
+      allow create, update: if isValidId(userId) && isOwner(userId) && isValidUser(request.resource.data, userId);
+      allow delete: if isSuperAdmin();
+
+      // 3. User Isolated Quality Audit Interactions & Gemini Exchanges
+      match /interactions/{interactionId} {
+        allow get: if isValidId(userId) && isValidId(interactionId) && (isOwner(userId) || isSuperAdmin());
+        allow list: if isValidId(userId) && (isOwner(userId) || isSuperAdmin());
+        allow create: if isValidId(userId) && isValidId(interactionId) && isOwner(userId) && isValidInteraction(request.resource.data, userId);
+        allow update: if isValidId(userId) && isValidId(interactionId) && isOwner(userId) && isValidInteraction(request.resource.data, userId);
+        allow delete: if isValidId(userId) && isValidId(interactionId) && (isOwner(userId) || isSuperAdmin());
+      }
+    }
+
+    // 4. Company Benchmarks & Audit Guidelines (Managed by Super Admin, Readable by Authenticated Employees)
+    match /company_benchmarks/{benchmarkId} {
+      allow get: if isSignedIn() && isValidId(benchmarkId);
+      allow list: if isSignedIn();
+      allow create, update: if isSuperAdmin() && isValidId(benchmarkId) && isValidBenchmark(request.resource.data);
+      allow delete: if isSuperAdmin() && isValidId(benchmarkId);
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Tawi-Tawi Divers Club Inc. - Quality, Safety & Audit Platform",
+  "description": "User-authenticated quality audit, dive safety compliance, and operational reflection platform for Tawi-Tawi Divers Club Inc., powered by Gemini 3.6 Flash and Cloud Firestore with super admin governance.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
